@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Camera6</string>
+    <string name="no_device">No device found</string>
+    <string name="refresh">Refresh</string>
+</resources>
