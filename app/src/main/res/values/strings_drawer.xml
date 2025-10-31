@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Drawer accessibility strings -->
+    <string name="nav_open">Open navigation drawer</string>
+    <string name="nav_close">Close navigation drawer</string>
+
+    <!-- Sections -->
+    <string name="menu_section_resolution">Resolution</string>
+    <string name="menu_section_frame_format">Frame format</string>
+    <string name="menu_section_fps">FPS</string>
+    <string name="menu_section_exposure">Exposure</string>
+    <string name="menu_section_white_balance">White balance</string>
+    <string name="menu_section_orientation">Rotate / Flip</string>
+
+    <!-- Resolution items -->
+    <string name="menu_res_640x480">640 × 480</string>
+    <string name="menu_res_1280x720">1280 × 720 (HD)</string>
+    <string name="menu_res_1920x1080">1920 × 1080 (FHD)</string>
+
+    <!-- Frame formats -->
+    <string name="menu_format_mjpeg">MJPEG</string>
+    <string name="menu_format_yuyv">YUYV</string>
+
+    <!-- FPS -->
+    <string name="menu_fps_auto">Auto</string>
+    <string name="menu_fps_15">15 fps</string>
+    <string name="menu_fps_30">30 fps</string>
+
+    <!-- Exposure -->
+    <string name="menu_exposure_auto">Auto</string>
+    <string name="menu_exposure_manual">Manual…</string>
+
+    <!-- White balance -->
+    <string name="menu_wb_auto">Auto</string>
+    <string name="menu_wb_incandescent">Incandescent</string>
+    <string name="menu_wb_fluorescent">Fluorescent</string>
+    <string name="menu_wb_daylight">Daylight</string>
+    <string name="menu_wb_cloudy">Cloudy</string>
+
+    <!-- Orientation -->
+    <string name="menu_rotate_0">Rotate 0°</string>
+    <string name="menu_rotate_90">Rotate 90°</string>
+    <string name="menu_rotate_180">Rotate 180°</string>
+    <string name="menu_rotate_270">Rotate 270°</string>
+    <string name="menu_flip_h">Flip Horizontal</string>
+    <string name="menu_flip_v">Flip Vertical</string>
+</resources>

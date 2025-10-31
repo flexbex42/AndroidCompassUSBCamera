@@ -15,6 +15,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.camera6.databinding.ActivityMainBinding
 import android.content.Context.RECEIVER_NOT_EXPORTED
 
+// Added imports for the drawer UI
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import com.google.android.material.navigation.NavigationView
+
 /**
  * MainActivity:
  * - Registers a receiver for the USB permission result.
@@ -61,6 +66,21 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        // Drawer: set up Material toolbar and hamburger toggle
+        setSupportActionBar(viewBinding.toolbar)
+        val toggle = ActionBarDrawerToggle(
+            this,
+            viewBinding.drawerLayout,
+            viewBinding.toolbar,
+            R.string.nav_open,
+            R.string.nav_close
+        )
+        viewBinding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        // Drawer menu selection: currently no-op (just closes drawer)
+        viewBinding.navView.setNavigationItemSelectedListener(drawerItemSelected)
+
         // Register receiver for our custom permission action (Android 12+ requires a visibility flag).
         registerReceiver(
             usbReceiver,
@@ -100,6 +120,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "No USB devices found", Toast.LENGTH_LONG).show()
         }
+    }
+
+    // Drawer listener: keep UI responsive but do nothing functionally yet
+    private val drawerItemSelected = NavigationView.OnNavigationItemSelectedListener { _ ->
+        viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
+        true
     }
 
     override fun onDestroy() {
