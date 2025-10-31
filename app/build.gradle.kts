@@ -33,6 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -56,6 +59,9 @@ dependencies {
     implementation(libs.androidx.material3.android)
 
     implementation(libs.timber)
+
+    implementation(libs.material.dialogs.core)
+    implementation(libs.material.dialogs.core)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
