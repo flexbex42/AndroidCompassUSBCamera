@@ -1,73 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Section: Resolution -->
+    <!-- Resolution -->
+    <item android:title="Resolution" />
     <item
-        android:id="@+id/section_resolution"
-        android:title="@string/menu_section_resolution">
-        <menu>
-            <item android:id="@+id/res_640x480" android:title="@string/menu_res_640x480" />
-            <item android:id="@+id/res_1280x720" android:title="@string/menu_res_1280x720" />
-            <item android:id="@+id/res_1920x1080" android:title="@string/menu_res_1920x1080" />
-        </menu>
-    </item>
-
-    <!-- Section: Frame format -->
+        android:id="@+id/res_640x480"
+        android:title="640 x 480" />
     <item
-        android:id="@+id/section_frame_format"
-        android:title="@string/menu_section_frame_format">
-        <menu>
-            <item android:id="@+id/format_mjpeg" android:title="@string/menu_format_mjpeg" />
-            <item android:id="@+id/format_yuyv" android:title="@string/menu_format_yuyv" />
-        </menu>
-    </item>
-
-    <!-- Section: FPS -->
+        android:id="@+id/res_1280x720"
+        android:title="1280 x 720" />
     <item
-        android:id="@+id/section_fps"
-        android:title="@string/menu_section_fps">
-        <menu>
-            <item android:id="@+id/fps_auto" android:title="@string/menu_fps_auto" />
-            <item android:id="@+id/fps_15" android:title="@string/menu_fps_15" />
-            <item android:id="@+id/fps_30" android:title="@string/menu_fps_30" />
-        </menu>
-    </item>
+        android:id="@+id/res_1920x1080"
+        android:title="1920 x 1080" />
 
-    <!-- Section: Exposure -->
+    <!-- Format -->
+    <item android:title="Format" />
     <item
-        android:id="@+id/section_exposure"
-        android:title="@string/menu_section_exposure">
-        <menu>
-            <item android:id="@+id/exposure_auto" android:title="@string/menu_exposure_auto" />
-            <item android:id="@+id/exposure_manual" android:title="@string/menu_exposure_manual" />
-        </menu>
-    </item>
-
-    <!-- Section: White balance -->
+        android:id="@+id/format_mjpeg"
+        android:title="MJPEG" />
     <item
-        android:id="@+id/section_white_balance"
-        android:title="@string/menu_section_white_balance">
-        <menu>
-            <item android:id="@+id/wb_auto" android:title="@string/menu_wb_auto" />
-            <item android:id="@+id/wb_incandescent" android:title="@string/menu_wb_incandescent" />
-            <item android:id="@+id/wb_fluorescent" android:title="@string/menu_wb_fluorescent" />
-            <item android:id="@+id/wb_daylight" android:title="@string/menu_wb_daylight" />
-            <item android:id="@+id/wb_cloudy" android:title="@string/menu_wb_cloudy" />
-        </menu>
-    </item>
+        android:id="@+id/format_yuyv"
+        android:title="YUYV" />
 
-    <!-- Section: Orientation -->
+    <!-- FPS -->
+    <item android:title="FPS" />
     <item
-        android:id="@+id/section_orientation"
-        android:title="@string/menu_section_orientation">
-        <menu>
-            <item android:id="@+id/rotate_0" android:title="@string/menu_rotate_0" />
-            <item android:id="@+id/rotate_90" android:title="@string/menu_rotate_90" />
-            <item android:id="@+id/rotate_180" android:title="@string/menu_rotate_180" />
-            <item android:id="@+id/rotate_270" android:title="@string/menu_rotate_270" />
-            <item android:id="@+id/flip_h" android:title="@string/menu_flip_h" />
-            <item android:id="@+id/flip_v" android:title="@string/menu_flip_v" />
-        </menu>
-    </item>
+        android:id="@+id/fps_auto"
+        android:title="Auto" />
+    <item
+        android:id="@+id/fps_15"
+        android:title="15 FPS" />
+    <item
+        android:id="@+id/fps_30"
+        android:title="30 FPS" />
 
+    <item
+        android:id="@+id/item_about"
+        android:title="About" />
 </menu>
