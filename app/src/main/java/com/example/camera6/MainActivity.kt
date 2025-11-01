@@ -9,7 +9,6 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -20,14 +19,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.camera6.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
-import android.content.Context.RECEIVER_NOT_EXPORTED
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -43,7 +40,6 @@ import android.text.style.ForegroundColorSpan
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
-    private var mWakeLock: PowerManager.WakeLock? = null
 
     private val TAG = "MainActivity"
     private val usbPermissionAction = "com.example.camera6.USB_PERMISSION"
@@ -61,40 +57,68 @@ class MainActivity : AppCompatActivity() {
     private val FORMAT_IDS = intArrayOf(R.id.format_mjpeg, R.id.format_yuyv)
     private val FPS_IDS = intArrayOf(R.id.fps_auto, R.id.fps_15, R.id.fps_30)
 
+    // Scan connected USB devices and request permission for the first one
+    private fun scanAndRequestPermission() {
+        val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+        val deviceList = usbManager.deviceList
+        Log.d(TAG, "FAB scan: USB devices found: ${deviceList.size}")
+        if( deviceList.isEmpty()) {
+            Toast.makeText(this, "No USB devices found", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val device = deviceList.values.first()
+        val hasPerm = usbManager.hasPermission(device)
+        handleDeviceFound(device, usbManager, hasPerm)
+    }
     // Receives the result of UsbManager.requestPermission()
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action != usbPermissionAction) return
+            // inside usbReceiver.onReceive
             val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
             val granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
-            Log.d(TAG, "USB permission callback: granted=$granted, device=$device")
-            if (granted && device != null) {
-                usbDeviceId = device.deviceId
-
-                val deviceKey = getUsbDeviceKey(device)
-                currentDeviceKey = deviceKey
-
-                val productName = device.productName ?: "USB_${device.vendorId}_${device.productId}"
-                val storedName = SettingsManager.getDeviceName(this@MainActivity, deviceKey) ?: productName
-
-                val hadSettings = SettingsManager.hasSettings(this@MainActivity, deviceKey)
-                if (!hadSettings) {
-                    SettingsManager.createDefaultForDevice(this@MainActivity, deviceKey, storedName)
-                    Toast.makeText(this@MainActivity, "Found new $storedName", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this@MainActivity, "Found again $storedName", Toast.LENGTH_LONG).show()
-                }
-
-                // Load settings and color the drawer
-                loadSettingsIntoDrawer(deviceKey)
-
-                launchDemoFragment(usbDeviceId)
-            } else {
-                Toast.makeText(context, "USB permission denied!", Toast.LENGTH_SHORT).show()
+            if (device != null) {
+                // granted indicates whether permission was just given by system
+                handleDeviceFound(device, getSystemService(Context.USB_SERVICE) as UsbManager, granted)
             }
         }
     }
+    // Helper: centralize handling of a found USB device so scan and receiver can reuse it.
+    private fun handleDeviceFound(device: UsbDevice, usbManager: UsbManager, permissionAlreadyGranted: Boolean) {
+        // Compute stable device key and human-readable name
+        val deviceKey = getUsbDeviceKey(device)
+        val productName = device.productName ?: "USB_${device.vendorId}_${device.productId}"
+        val humanName = SettingsManager.getDeviceName(this, deviceKey) ?: productName
 
+        // Create defaults for new devices
+        val hadSettings = SettingsManager.hasSettings(this, deviceKey)
+        if (!hadSettings) {
+            SettingsManager.createDefaultForDevice(this, deviceKey, humanName)
+            Toast.makeText(this, "Found new $humanName", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Found again $humanName", Toast.LENGTH_SHORT).show()
+        }
+
+        // Remember current device
+        currentDeviceKey = deviceKey
+        usbDeviceId = device.deviceId
+
+        if (permissionAlreadyGranted) {
+            // If we already have permission, immediately launch the fragment
+            loadSettingsIntoDrawer(deviceKey)
+            launchDemoFragment(usbDeviceId)
+        } else {
+            // Otherwise request permission with the same PendingIntent used elsewhere
+            val permissionIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                Intent(usbPermissionAction).setPackage(packageName),
+                PendingIntent.FLAG_MUTABLE
+            )
+            usbManager.requestPermission(device, permissionIntent)
+            Log.d(TAG, "Requested USB permission for deviceId=${device.deviceId}")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -213,51 +237,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Scan connected USB devices and request permission for the first one
-    private fun scanAndRequestPermission() {
-        val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
-        val deviceList = usbManager.deviceList
-        Log.d(TAG, "FAB scan: USB devices found: ${deviceList.size}")
 
-        if (deviceList.isEmpty()) {
-            Toast.makeText(this, "No USB devices found", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val device = deviceList.values.first()
-        Log.d(TAG, "FAB scan: Selected device: vendorId=${device.vendorId}, productId=${device.productId}, id=${device.deviceId}")
-
-        val deviceKey = getUsbDeviceKey(device)
-        val productName = device.productName ?: "USB_${device.vendorId}_${device.productId}"
-        val humanName = SettingsManager.getDeviceName(this, deviceKey) ?: productName
-
-        val hadSettings = SettingsManager.hasSettings(this, deviceKey)
-        if (!hadSettings) {
-            SettingsManager.createDefaultForDevice(this, deviceKey, humanName)
-            Toast.makeText(this, "Found new $humanName", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "Found again $humanName", Toast.LENGTH_LONG).show()
-        }
-
-        currentDeviceKey = deviceKey
-
-        if (usbManager.hasPermission(device)) {
-            usbDeviceId = device.deviceId
-            loadSettingsIntoDrawer(deviceKey)
-            launchDemoFragment(usbDeviceId)
-            return
-        }
-
-        val permissionIntent = PendingIntent.getBroadcast(
-            this,
-            0,
-            Intent(usbPermissionAction).setPackage(packageName),
-            PendingIntent.FLAG_MUTABLE
-        )
-        Log.d(TAG, "FAB scan: Requesting USB permission…")
-        usbManager.requestPermission(device, permissionIntent)
-    }
-
+    //We have a working USB device and permission; launch the DemoFragment
     private fun launchDemoFragment(deviceId: Int) {
         supportFragmentManager
             .beginTransaction()
